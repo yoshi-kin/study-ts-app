@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import { db } from "@/database/drizzle";
-import { getServerSession } from "@/actions/getServerSession";
+import { getSession } from "@/actions/getServerSession";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
 import React, { ReactNode } from "react";
@@ -8,7 +8,7 @@ import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
-  const session = await getServerSession();
+  const session = await getSession();
   if (!session) redirect("/sign-in");
 
   after(async () => {

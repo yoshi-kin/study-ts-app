@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
 import Image from "next/image";
-import { getServerSession } from "@/actions/getServerSession";
+import { getSession } from "@/actions/getServerSession";
 import { redirect } from "next/navigation";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
-  const session = await getServerSession();
+  const session = await getSession();
   if (session) redirect("/");
 
   return (

@@ -28,6 +28,7 @@ const betterAuthHandlers = toNextJsHandler(auth.handler);
 const ajProtectedPOST = async (req: NextRequest) => {
   const { email } = await req.clone().json();
   const decision = await aj.protect(req, { email });
+  console.log("decision", decision);
 
   if (decision.isDenied()) {
     if (decision.reason.isEmail()) {
