@@ -26,8 +26,8 @@ const aj = arcjet({
 
 const betterAuthHandlers = toNextJsHandler(auth.handler);
 const ajProtectedPOST = async (req: NextRequest) => {
-  const { email } = await req.clone().json();
-  console.log("request", req.clone().json());
+  const body = await req.clone().json();
+  const { email } = body;
   console.log("email", email);
   const decision = await aj.protect(req, { email });
   console.log("decision", decision.isDenied());
@@ -66,7 +66,13 @@ const ajProtectedPOST = async (req: NextRequest) => {
       );
     }
   }
-  return betterAuthHandlers.POST(req);
+  return betterAuthHandlers.POST(
+    new NextRequest(req.url, {
+      method: req.method,
+      headers: req.headers,
+      body: JSON.stringify(body),
+    })
+  );
 };
 
 export { ajProtectedPOST as POST };
