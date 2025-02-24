@@ -27,6 +27,7 @@ const aj = arcjet({
 const betterAuthHandlers = toNextJsHandler(auth.handler);
 const ajProtectedPOST = async (req: NextRequest) => {
   const { email } = await req.clone().json();
+  console.log("email", email);
   const decision = await aj.protect(req, { email });
   console.log("decision", decision);
 
