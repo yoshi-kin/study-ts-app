@@ -7,8 +7,6 @@ import { sendEmail } from "./email";
 import { redis } from "@/database/redis";
 import { openAPI, jwt } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
-import nodemailer from "nodemailer";
-import { SendMailOptions } from "nodemailer";
 
 const {
   env: {
@@ -42,18 +40,19 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    sendResetPassword: async ({ user, url }) => {
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url, token }) => {
       await sendEmail({
         name: user.name,
         to: user.email,
         subject: "Reset your password",
-        text: `Click the link to reset your password: ${url}`,
+        text: `Click the link to reset your password:\n${url}`,
       });
     },
   },
   emailVerification: {
     sendOnSignUp: true,
-    // autoSignInAfterVerification: true,
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       console.log("メール送信");
       await sendEmail({

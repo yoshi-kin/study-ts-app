@@ -12,3 +12,23 @@ export const signInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password is too short" }),
+    confirmPassword: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password is too short" }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .email({ message: "Invalid email address" }),
+});

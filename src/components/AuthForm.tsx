@@ -25,24 +25,30 @@ import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
 import ImageUpLoad from "./ImageUpLoad";
 import { authClient } from "@/lib/authClient";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { signInSchema, signUpSchema } from "@/lib/validations";
 
-interface Props<T extends FieldValues> {
-  schema: z.ZodType<T>;
-  defaultValues: T;
-  // onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>;
+interface Props {
   type: "SIGN_IN" | "SIGN_UP";
 }
-const AuthForm = <T extends FieldValues>({
-  type,
-  schema,
-  defaultValues,
-}: // onSubmit,
-Props<T>) => {
+const AuthForm = ({ type }: Props) => {
   const isSignIn = type === "SIGN_IN";
+  const schema = type === "SIGN_IN" ? signInSchema : signUpSchema;
+  const defaultValues =
+    type === "SIGN_IN"
+      ? { email: "", password: "" }
+      : {
+          fullName: "",
+          email: "",
+          password: "",
+          universityId: 0,
+          universityCard: "",
+        };
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSocial, setIsLoadingSocial] = useState(false);
+  type T = z.infer<typeof schema>;
   const { toast } = useToast();
   const router = useRouter();
   const form: UseFormReturn<T> = useForm({
@@ -116,7 +122,11 @@ Props<T>) => {
           : "Please complete all fields and upload a valid university ID to gain access to the library"}
       </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+          noValidate
+        >
           {Object.keys(defaultValues).map((field, idx) => (
             <FormField
               key={idx}
@@ -153,29 +163,62 @@ Props<T>) => {
         </form>
       </Form>
       <hr />
-      OR
+      <p className="flex justify-center items-center">OR</p>
       <div>
         <Button
-          className="text-black"
+          className="form-btn"
           onClick={async () => {
-            await authClient.signIn.social({
-              provider: "github",
-              callbackURL: "/",
-            });
+            await authClient.signIn.social(
+              {
+                provider: "github",
+                callbackURL: "/",
+              },
+              {
+                onRequest: (ctx) => {
+                  setIsLoadingSocial(true);
+                },
+                onError: (ctx) => {
+                  toast({
+                    title: ctx.error.message,
+                    variant: "destructive",
+                  });
+                  setIsLoadingSocial(false);
+                },
+              }
+            );
           }}
         >
-          Github
+          {isLoadingSocial ? (
+            <>
+              <Loader2 className="animate-spin" size={40} />
+              Github...
+            </>
+          ) : (
+            <>
+              <Github size={36} />
+              Github
+            </>
+          )}
         </Button>
       </div>
-      <p className="text-center text-base font-medium">
-        {isSignIn ? "New to BookWise" : "Already have an account"}
-        <Link
-          href={isSignIn ? "/sign-up" : "/sign-in"}
-          className="font-bold text-primary"
-        >
-          {isSignIn ? " Create an account" : " Sign in"}
-        </Link>
-      </p>
+      <div>
+        <p className="text-center text-base font-medium">
+          {isSignIn ? "New to BookWise" : "Already have an account"}
+          <Link
+            href={isSignIn ? "/sign-up" : "/sign-in"}
+            className="font-bold text-primary"
+          >
+            {isSignIn ? " Create an account" : " Sign in"}
+          </Link>
+        </p>
+        {isSignIn && (
+          <p className="flex justify-center items-center">
+            <Link href={"/forgot-password"} className="underline">
+              forgot your password ?
+            </Link>
+          </p>
+        )}
+      </div>
     </div>
   );
 };

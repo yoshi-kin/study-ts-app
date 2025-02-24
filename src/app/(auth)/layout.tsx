@@ -1,8 +1,6 @@
 import React, { ReactNode } from "react";
 import Image from "next/image";
-import { authClient } from "@/lib/authClient";
-import { headers } from "next/headers";
-import { getServerSession } from "@/lib/getServerSession";
+import { getServerSession } from "@/actions/getServerSession";
 import { redirect } from "next/navigation";
 
 const Layout = async ({ children }: { children: ReactNode }) => {

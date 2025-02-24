@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import { db } from "@/database/drizzle";
-import { getServerSession } from "@/lib/getServerSession";
+import { getServerSession } from "@/actions/getServerSession";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
 import React, { ReactNode } from "react";
