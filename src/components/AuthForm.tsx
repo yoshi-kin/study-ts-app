@@ -29,6 +29,8 @@ import { Loader2, Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { signInSchema, signUpSchema } from "@/lib/validations";
+import { workflowClient } from "@/lib/workflow";
+import { signIn, signUp } from "@/actions/authActions";
 
 interface Props {
   type: "SIGN_IN" | "SIGN_UP";
@@ -57,59 +59,90 @@ const AuthForm = ({ type }: Props) => {
   });
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
+    setIsLoading(true);
     try {
       if (isSignIn) {
-        await authClient.signIn.email(
-          {
-            email: data.email,
-            password: data.password,
-            callbackURL: "/",
-          },
-          {
-            onRequest: (ctx) => {
-              setIsLoading(true);
-            },
-            onSuccess: (ctx) => {
-              router.push("/");
-            },
-            onError: (ctx) => {
-              toast({
-                title: "Failed to sign up",
-                variant: "destructive",
-              });
-              setIsLoading(false);
-            },
-          }
-        );
+        const response = await signIn({
+          email: data.email,
+          password: data.password,
+        });
+        if (response.status === 200) {
+          router.push("/");
+        } else {
+          toast({
+            title: response.message,
+            variant: "destructive",
+          });
+          setIsLoading(false);
+        }
+        // await authClient.signIn.email(
+        //   {
+        //     email: data.email,
+        //     password: data.password,
+        //     callbackURL: "/",
+        //   },
+        //   {
+        //     onRequest: (ctx) => {
+        //       setIsLoading(true);
+        //     },
+        //     onSuccess: (ctx) => {
+        //       router.push("/");
+        //     },
+        //     onError: (ctx) => {
+        //       toast({
+        //         title: "Failed to sign up",
+        //         variant: "destructive",
+        //       });
+        //       setIsLoading(false);
+        //     },
+        //   }
+        // );
       } else {
-        authClient.signUp.email(
-          {
-            name: data.fullName,
-            email: data.email,
-            password: data.password,
-            universityId: data.universityId,
-            universityCard: data.universityCard,
-            callbackURL: "/sign-in",
-          },
-          {
-            onRequest: (ctx) => {
-              console.log(ctx);
-              setIsLoading(true);
-            },
-            onSuccess: (ctx) => {
-              console.log(ctx);
-              setIsLoading(false);
-              router.push("/sign-in");
-            },
-            onError: (ctx) => {
-              toast({
-                title: ctx.error.message,
-                variant: "destructive",
-              });
-              setIsLoading(false);
-            },
-          }
-        );
+        const response = await signUp({
+          name: data.fullName,
+          email: data.email,
+          password: data.password,
+          universityId: data.universityId,
+          universityCard: data.universityCard,
+        });
+        if (response.status === 200) {
+          router.push("/sign-in");
+        } else {
+          toast({
+            title: response.message,
+            variant: "destructive",
+          });
+          setIsLoading(false);
+        }
+        // authClient.signUp.email(
+        //   {
+        //     name: data.fullName,
+        //     email: data.email,
+        //     password: data.password,
+        //     universityId: data.universityId,
+        //     universityCard: data.universityCard,
+        //     callbackURL: "/sign-in",
+        //   },
+        //   {
+        //     onRequest: (ctx) => {
+        //       console.log(ctx);
+        //       setIsLoading(true);
+        //     },
+        //     onSuccess: (ctx) => {
+        //       console.log(ctx);
+        //       // await workflowClient.trigger({});
+        //       setIsLoading(false);
+        //       router.push("/sign-in");
+        //     },
+        //     onError: (ctx) => {
+        //       toast({
+        //         title: ctx.error.message,
+        //         variant: "destructive",
+        //       });
+        //       setIsLoading(false);
+        //     },
+        //   }
+        // );
       }
     } catch (error) {
       console.log(error);

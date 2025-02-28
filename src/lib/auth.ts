@@ -99,21 +99,21 @@ export const auth = betterAuth({
       },
     },
   },
-  secondaryStorage: {
-    get: async (key: string) => {
-      console.log("redis key", key);
-      const value = (await redis.get(key)) as object | null;
-      if (!value) return null;
-      console.log("redis value", typeof value);
-      return JSON.stringify(value);
-    },
-    set: async (key: string, value: string, ttl) => {
-      if (ttl) await redis.set(key, value);
-    },
-    delete: async (key: string) => {
-      await redis.del(key);
-    },
-  },
+  // secondaryStorage: {
+  //   get: async (key: string) => {
+  //     console.log("redis key", key);
+  //     const value = (await redis.get(key)) as object | null;
+  //     if (!value) return null;
+  //     console.log("redis value", typeof value);
+  //     return JSON.stringify(value);
+  //   },
+  //   set: async (key: string, value: string, ttl) => {
+  //     if (ttl) await redis.set(key, value);
+  //   },
+  //   delete: async (key: string) => {
+  //     await redis.del(key);
+  //   },
+  // },
   plugins: [
     nextCookies(),
     // openAPI(),

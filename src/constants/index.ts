@@ -1,3 +1,7 @@
+export const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
+export const THREE_DAYS_IN_MS = ONE_DAY_IN_MS * 3;
+export const THIRTY_DAYS_IN_MS = ONE_DAY_IN_MS * 30;
+
 export const navigationLinks = [
   {
     href: "/library",

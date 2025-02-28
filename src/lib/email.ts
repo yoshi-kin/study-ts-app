@@ -4,16 +4,15 @@
 // import EmailTemplate from "@/components/EmailTemplate";
 // import config from "./config";
 // import { ReactNode } from "react";
-import nodemailer from "nodemailer";
-import { SendMailOptions } from "nodemailer";
+import nodemailer, { SendMailOptions } from "nodemailer";
 
 interface Email {
-  name: string;
+  name?: string;
   to: string;
   subject: string;
   text: string;
 }
-// Looking to send emails in production? Check out our Email API/SMTP product!
+
 const transporter = nodemailer.createTransport({
   host: "sandbox.smtp.mailtrap.io",
   port: 2525,

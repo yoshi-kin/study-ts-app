@@ -1,41 +1,12 @@
-import { eq } from "drizzle-orm";
+import { serve } from "@upstash/workflow/nextjs";
+import { InitialPayload, UserState } from "../../../../../types";
+import { THIRTY_DAYS_IN_MS, THREE_DAYS_IN_MS } from "@/constants";
+import { sendEmail } from "@/lib/email";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
-import { serve } from "@upstash/workflow/nextjs";
-import { sendEmail } from "@/lib/email";
-type UserState = "non-active" | "active";
+import { eq } from "drizzle-orm";
 
-type InitialData = {
-  email: string;
-  name: string;
-};
-
-const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
-const THREE_DAYS_IN_MS = ONE_DAY_IN_MS * 3;
-const THIRTY_DAYS_IN_MS = ONE_DAY_IN_MS * 30;
-
-const getUserState = async (email: string): Promise<UserState> => {
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
-
-  if (user.length === 0) {
-    return "non-active";
-  }
-
-  const lastActivityDate = new Date(user[0].lastActivityDate!);
-  const currentDate = new Date();
-  const timeDifference = currentDate.getTime() - lastActivityDate.getTime();
-
-  if (timeDifference > THREE_DAYS_IN_MS && timeDifference < THIRTY_DAYS_IN_MS) {
-    return "non-active";
-  }
-  return "active";
-};
-
-export const { POST } = serve<InitialData>(async (context) => {
+export const { POST } = serve<InitialPayload>(async (context) => {
   const { email, name } = context.requestPayload;
 
   await context.run("new-signup", async () => {
@@ -76,3 +47,24 @@ export const { POST } = serve<InitialData>(async (context) => {
     await context.sleep("wait-for-1-month", THIRTY_DAYS_IN_MS);
   }
 });
+
+export const getUserState = async (email: string): Promise<UserState> => {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  if (user.length === 0) {
+    return "non-active";
+  }
+
+  const lastActivityDate = new Date(user[0].lastActivityDate!);
+  const currentDate = new Date();
+  const timeDifference = currentDate.getTime() - lastActivityDate.getTime();
+
+  if (timeDifference > THREE_DAYS_IN_MS && timeDifference < THIRTY_DAYS_IN_MS) {
+    return "non-active";
+  }
+  return "active";
+};

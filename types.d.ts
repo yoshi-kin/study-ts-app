@@ -23,3 +23,10 @@ interface AuthCredentials {
   universityId: number;
   universityCard: string;
 }
+
+type InitialPayload = {
+  email: string;
+  name: string;
+};
+
+type UserState = "non-active" | "active";
