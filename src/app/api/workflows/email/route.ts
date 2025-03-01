@@ -1,11 +1,11 @@
 import { sendEmail } from "@/lib/email";
-import { AnyForeignKeyBuilder } from "drizzle-orm/pg-core";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { to, from, subject, text } = body;
+    const { to, subject, text } = body;
+    console.log(to, subject, text);
     await sendEmail({ to, subject, text });
     return NextResponse.json({
       status: 200,

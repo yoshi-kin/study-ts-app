@@ -1,7 +1,6 @@
 import { serve } from "@upstash/workflow/nextjs";
 import { InitialPayload, UserState } from "../../../../../types";
 import { THIRTY_DAYS_IN_MS, THREE_DAYS_IN_MS } from "@/constants";
-import { sendEmail } from "@/lib/email";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
