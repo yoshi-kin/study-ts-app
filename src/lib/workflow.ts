@@ -13,22 +13,22 @@ const qstashClient = new QStashClient({
 
 export const qSendEmail = async ({
   to,
-  email,
+  name,
   subject,
-  message,
+  text,
 }: {
   to: string;
-  email: string;
+  name?: string;
   subject: string;
-  message: string;
+  text: string;
 }) => {
   await qstashClient.publishJSON({
     url: `${config.env.apiEndpoint}/api/workflows/email`,
     body: {
-      from: email,
+      name: name,
       to: to,
       subject: subject,
-      html: message,
+      text: text,
     },
   });
 };

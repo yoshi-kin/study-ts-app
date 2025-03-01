@@ -5,12 +5,13 @@ import { sendEmail } from "@/lib/email";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
+import { qSendEmail } from "@/lib/workflow";
 
 export const { POST } = serve<InitialPayload>(async (context) => {
   const { email, name } = context.requestPayload;
 
   await context.run("new-signup", async () => {
-    await sendEmail({
+    await qSendEmail({
       to: email,
       name: name,
       subject: "Welcome to our platform",
@@ -27,7 +28,7 @@ export const { POST } = serve<InitialPayload>(async (context) => {
 
     if (state === "non-active") {
       await context.run("send-email-non-active", async () => {
-        await sendEmail({
+        await qSendEmail({
           to: email,
           name: name,
           subject: "Are you still there?",
@@ -36,7 +37,7 @@ export const { POST } = serve<InitialPayload>(async (context) => {
       });
     } else if (state === "active") {
       await context.run("send-email-active", async () => {
-        await sendEmail({
+        await qSendEmail({
           to: email,
           name: name,
           subject: "Welcome back",
